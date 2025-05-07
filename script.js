@@ -6,9 +6,16 @@ let ghosts = [];
 let ghostSpeed = 1000;
 let isGameRunning = false;
 let ghostInterval;
+let score = 0;
 
 
 document.getElementById("new-game-btn").addEventListener('click', startGame);
+
+function updateScoreBoard(points) {
+    const scoreBoard = document.getElementById('score-board');
+    score = score + points;
+    scoreBoard.textContent = `Pisteet: ${score}`;
+   }
 
 function calculateCellSize(){
     const sreenSize = Math.min(window.innerWidth, window.innerHeight);
@@ -57,7 +64,15 @@ function startGame(){
     player = new Player(0,0)
     board = generateRandomBoard();
 
-    ghostInterval = setInterval (moveGhosts, ghostSpeed)
+    //ghostInterval = setInterval (moveGhosts, ghostSpeed)
+
+    setTimeout(() => {
+        //Laitetaan haamut liikkumaan sekunnin välein
+        ghostInterval = setInterval(moveGhosts, ghostSpeed)
+        }, 1000);
+
+    score = 0;
+    updateScoreBoard(0);
 
     drawBoard(board);
 }
@@ -297,11 +312,12 @@ if(getCell(board, x, y)=== 'W'){
 const ghostIndex = ghosts.findIndex(ghost => ghost.x === x && ghost.y === y);
 
 if(ghostIndex !== -1){
-    ghosts.splice(ghostIndex,1);
+    ghosts.splice(ghostIndex, 1);
+    updateScoreBoard(100);
 }
 
 if (ghosts.length === 0){
-    alert ("HUI JUMA")
+    startNextLevel();
 }
 
 console.log(ghosts);
@@ -347,6 +363,23 @@ function endGame(){
     document.getElementById('intro-screen').style.display = 'block';
     document.getElementById('game-screen').style.display = 'none';
     
+}
+
+function startNextLevel() {
+    alert('Aik taktinen. Vihut on ny nopeempia nii pysy tuffina.');
+    
+    // Generoi uusi pelikenttä
+    board = generateRandomBoard();
+    drawBoard(board);
+    
+    ghostSpeed = ghostSpeed*0.9;
+    // Pysäytä vanha intervalli ja käynnistä uusi nopeammin
+    clearInterval(ghostInterval);
+     //Haamut alkavat liikkumaan sekunnin päästä startin painamisesta
+   setTimeout(() => {
+    //Laitetaan haamut liikkumaan sekunnin välein
+    ghostInterval = setInterval(moveGhosts, ghostSpeed)
+    }, 1000);
 }
 
 /* function moveGhosts(){
